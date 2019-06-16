@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.js": "localhost:3000/static/js/main.a158ec49.chunk.js",
-    "main.js.map": "localhost:3000/static/js/main.a158ec49.chunk.js.map",
+    "main.js": "localhost:3000/static/js/main.d5433f87.chunk.js",
+    "main.js.map": "localhost:3000/static/js/main.d5433f87.chunk.js.map",
     "runtime~main.js": "localhost:3000/static/js/runtime~main.7579b25a.js",
     "runtime~main.js.map": "localhost:3000/static/js/runtime~main.7579b25a.js.map",
     "static/js/2.e8db9996.chunk.js": "localhost:3000/static/js/2.e8db9996.chunk.js",
     "static/js/2.e8db9996.chunk.js.map": "localhost:3000/static/js/2.e8db9996.chunk.js.map",
     "index.html": "localhost:3000/index.html",
-    "precache-manifest.8e37c57983395bddb06cc0dd923355f6.js": "localhost:3000/precache-manifest.8e37c57983395bddb06cc0dd923355f6.js",
+    "precache-manifest.2537c8bdfe2e2731ee198e5566ef196b.js": "localhost:3000/precache-manifest.2537c8bdfe2e2731ee198e5566ef196b.js",
     "service-worker.js": "localhost:3000/service-worker.js",
     "static/media/imdb-seeklogo.com.svg": "localhost:3000/static/media/imdb-seeklogo.com.8ba3391e.svg",
     "static/media/not-found.png": "localhost:3000/static/media/not-found.7f90e4d7.png",
