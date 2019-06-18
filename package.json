@@ -1,7 +1,6 @@
 {
-    "name": "wowsense-project",
+    "name": "dundja-movies",
     "version": "0.1.0",
-    "homepage": "https://dundja.github.io/dundja-movies-app",
     "private": true,
     "dependencies": {
         "axios": "^0.19.0",
@@ -17,6 +16,7 @@
         "react-router-dom": "^5.0.1",
         "react-scripts": "3.0.1",
         "react-scroll": "^1.7.12",
+        "react-select": "^3.0.4",
         "react-slick": "^0.23.2",
         "react-spring": "^8.0.23",
         "react-youtube": "^7.9.0",
@@ -26,9 +26,7 @@
         "start": "react-scripts start",
         "build": "react-scripts build",
         "test": "react-scripts test",
-        "eject": "react-scripts eject",
-        "predeploy": "npm run build",
-        "deploy": "gh-pages -d build"
+        "eject": "react-scripts eject"
     },
     "eslintConfig": {
         "extends": "react-app"
@@ -44,8 +42,5 @@
             "last 1 firefox version",
             "last 1 safari version"
         ]
-    },
-    "devDependencies": {
-        "gh-pages": "^2.0.0"
     }
 }

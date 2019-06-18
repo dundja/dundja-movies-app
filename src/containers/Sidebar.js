@@ -2,8 +2,10 @@ import React, { useContext } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
-import { MovieContext } from "../context/movieContext";
-import Logo from "../assets/img/popcorn-logo.jpg";
+import { GenresContext } from "../context/genresContext";
+import { MenuContext } from "../context/menuContext";
+import { ThemeContext } from "../context/themeContext";
+import Logo from "../assets/img/cat-logo.png";
 import MenuItem from "../components/MenuItem";
 
 const SideBarWrapper = styled.div`
@@ -17,9 +19,15 @@ const SideBarInner = styled.div`
     align-items: center;
     width: 25rem;
     margin-top: 4rem;
-    color: var(--color-lightMiddleBlue);
+    color: ${props =>
+        props.dark
+            ? "var(--color-lightMiddleBlue)"
+            : "var(--color-darkDarkBlue)"};
     padding: 2rem;
-    border-right: 1px solid var(--color-lightMiddleBlue);
+    border-right: ${props =>
+        props.dark
+            ? "1px solid var(--color-lightMiddleBlue)"
+            : "1px solid var(--color-darkDarkBlue)"};
 `;
 
 const LogoImg = styled.img`
@@ -54,10 +62,13 @@ const CategoryLinkWrp = styled(Link)`
 `;
 
 const Sidebar = () => {
-    const { state, dispatch } = useContext(MovieContext);
+    const { genresState } = useContext(GenresContext);
+    const { menuState } = useContext(MenuContext);
+    const { theme } = useContext(ThemeContext);
 
     const renderDiscover = () => {
-        const { staticCategories, selected } = state;
+        const { staticCategories } = genresState;
+        const { selected } = menuState;
         return staticCategories.map((category, i) => {
             return (
                 <CategoryLinkWrp
@@ -65,6 +76,7 @@ const Sidebar = () => {
                     to={`${process.env.PUBLIC_URL}/discover/${category}`}
                 >
                     <MenuItem
+                        dark={theme.dark}
                         title={category}
                         selected={category === selected ? true : false}
                     />
@@ -74,14 +86,15 @@ const Sidebar = () => {
     };
 
     const renderGenres = () => {
-        const { genres } = state.genres.data;
-        const { selected } = state;
+        const { genres } = genresState.genres.data;
+        const { selected } = menuState;
         return genres.map(genre => (
             <CategoryLinkWrp
                 key={genre.id}
                 to={`${process.env.PUBLIC_URL}/genres/${genre.name}`}
             >
                 <MenuItem
+                    dark={theme.dark}
                     title={genre.name}
                     selected={genre.name === selected ? true : false}
                 />
@@ -91,7 +104,7 @@ const Sidebar = () => {
 
     return (
         <SideBarWrapper>
-            <SideBarInner>
+            <SideBarInner dark={theme.dark}>
                 <a href="/">
                     <LogoImg src={Logo} alt="logo" />
                 </a>

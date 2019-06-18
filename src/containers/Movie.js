@@ -3,7 +3,10 @@ import styled from "styled-components";
 import YouTube from "react-youtube";
 import * as TYPES from "../context/types";
 import { Link } from "react-router-dom";
+import { GenresContext } from "../context/genresContext";
 import { MovieContext } from "../context/movieContext";
+import { CastContext } from "../context/castContext";
+import { ThemeContext } from "../context/themeContext";
 import tmdbAPI from "../api";
 import { Helmet } from "react-helmet";
 import queryString from "query-string";
@@ -19,6 +22,7 @@ import Toggler from "../components/Toggler";
 import Cast from "../components/Cast";
 import Loading from "../components/Loading";
 import Button from "../components/Button";
+import Header from "../components/Header";
 
 const Wrapper = styled.div`
     display: flex;
@@ -95,7 +99,10 @@ const MovieDetailsWrapper = styled.div`
 
 const MovieTitle = styled.h2`
     font-size: 3.5rem;
-    color: var(--color-lightMainWhite);
+    color: ${props =>
+        props.dark
+            ? "var(--color-darkDarkBlue)"
+            : "var(--color-darkMainWhite)"};
     text-transform: capitalize;
     display: block;
     margin-bottom: 1rem;
@@ -109,14 +116,16 @@ const MainDetailsWrapper = styled.div`
 const MainDetails = styled.div`
     position: relative;
     padding: 0.5rem 1rem;
-    color: white;
     display: flex;
     align-items: center;
     justify-content: flex-start;
 
     &:after {
         content: "";
-        background-color: white;
+        background-color: ${props =>
+            props.dark
+                ? "var(--color-darkDarkBlue)"
+                : "var(--color-darkMainWhite)"};
         position: absolute;
         right: 0;
         margin-left: 1rem;
@@ -129,7 +138,10 @@ const MainDetailsTextLink = styled(Link)`
     font-size: 1.4rem;
     position: relative;
     transition: all 0.3s ease-in-out;
-    color: inherit;
+    color: ${props =>
+        props.dark
+            ? "var(--color-darkDarkBlue)"
+            : "var(--color-darkMainWhite)"};
 
     &:after {
         content: "";
@@ -138,7 +150,10 @@ const MainDetailsTextLink = styled(Link)`
         top: 100%;
         width: 0;
         height: 1px;
-        background-color: white;
+        background-color: ${props =>
+            props.dark
+                ? "var(--color-darkDarkBlue)"
+                : "var(--color-darkMainWhite)"};
         transition: all 0.3s ease-in-out;
     }
 
@@ -151,12 +166,23 @@ const MainDetailsTextLink = styled(Link)`
 
 const MainDetailsText = styled.span`
     font-size: 1.4rem;
+    color: ${props =>
+        props.dark
+            ? "var(--color-darkDarkBlue)"
+            : "var(--color-darkMainWhite)"};
 `;
 
 const PegiAdult = styled.span`
-    border: 1px solid white;
+    border: ${props =>
+        props.dark
+            ? "1px solid var(--color-darkDarkBlue)"
+            : " 1px solid var(--color-darkMainWhite)"};
     font-size: 1.3rem;
     padding: 0.3rem 0.5rem;
+    color: ${props =>
+        props.dark
+            ? "var(--color-darkDarkBlue)"
+            : "var(--color-darkMainWhite)"};
 `;
 
 const ImdbLogo = styled.img`
@@ -166,7 +192,8 @@ const ImdbLogo = styled.img`
 
 const ImdbRaiting = styled.a`
     background-color: transparent;
-    color: #999;
+    color: ${props =>
+        props.dark ? "var(--color-darkFeatured)" : "var(--color-darkFeatured)"};
     font-size: 1rem;
     position: relative;
     display: flex;
@@ -174,8 +201,12 @@ const ImdbRaiting = styled.a`
 
     & > span {
         font-size: 1.4rem;
-        color: white;
+        color: ${props =>
+            props.dark
+                ? "var(--color-darkDarkBlue)"
+                : "var(--color-darkMainWhite)"};
         margin-left: 0.5rem;
+        font-weight: 600;
     }
 `;
 
@@ -194,7 +225,10 @@ const Line = styled.div`
     width: 0.1rem;
     border-bottom: 1px solid white;
     border-radius: 1rem;
-    background-color: white;
+    background-color: ${props =>
+        props.dark
+            ? "var(--color-darkDarkBlue)"
+            : "var(--color-darkMainWhite)"};
 `;
 
 const InnerDesc = styled.div`
@@ -204,7 +238,10 @@ const InnerDesc = styled.div`
 
     & p {
         font-size: 1.4rem;
-        color: white;
+        color: ${props =>
+            props.dark
+                ? "var(--color-darkDarkBlue)"
+                : "var(--color-darkMainWhite)"};
     }
 `;
 
@@ -213,7 +250,7 @@ const InnerDescTagline = styled.h2`
     font-weight: 300;
     color: ${props =>
         props.dark
-            ? "var(--color-lightDarkBlue)"
+            ? "var(--color-lightFeatured)"
             : "var(--color-lightDarkBlue)"};
     margin-bottom: 1.5rem;
 `;
@@ -229,7 +266,7 @@ const StatsHeader = styled.h2`
     font-size: 1.6rem;
     color: ${props =>
         props.dark
-            ? "var(--color-lightDarkBlue)"
+            ? "var(--color-darkDarkBlue)"
             : "var(--color-lightDarkBlue)"};
 `;
 
@@ -250,50 +287,33 @@ const StatsText = styled.p`
 const Movie = ({ location, match }) => {
     const [loaded, setLoaded] = useState(false);
     const [error, setError] = useState(false);
-    const { state, dispatch } = useContext(MovieContext);
+    const { genresState, genresDispatch } = useContext(GenresContext);
+    const { movieState, movieDispatch } = useContext(MovieContext);
+    const { castState, castDispatch } = useContext(CastContext);
+    const { theme } = useContext(ThemeContext);
     const movieId = match.params.id;
-    const { secure_base_url } = state.config.images;
-    const { base_url } = state.config.images;
-    const { poster_sizes } = state.config.images;
+    const { secure_base_url } = genresState.config.images;
+    const { base_url } = genresState.config.images;
+    const { poster_sizes } = genresState.config.images;
 
     useEffect(() => {
         scroll.scrollToTop({
             smooth: true
         });
 
-        const getMovie = async (id, dispatch) => {
-            dispatch({ type: TYPES.FETCH_MOVIE_LOADING });
-            const res = await tmdbAPI.get(`/movie/${id}`, {
-                params: {
-                    api_key: process.env.REACT_APP_APIKEY,
-                    append_to_response: "videos"
-                }
-            });
-            dispatch({ type: TYPES.FETCH_MOVIE, payload: res.data });
-            dispatch({ type: TYPES.FETCH_MOVIE_FINISHED });
+        const getMovieData = () => {
+            getMovie(movieId, movieDispatch);
+            getCast(movieId, castDispatch);
         };
 
-        const getCast = async (id, dispatch) => {
-            const res = await tmdbAPI.get(`/movie/${id}/credits`, {
-                params: {
-                    api_key: process.env.REACT_APP_APIKEY
-                }
-            });
-            dispatch({ type: TYPES.FETCH_CAST, payload: res.data.cast });
-        };
-
-        getMovie(movieId, dispatch);
-        getCast(movieId, dispatch);
+        getMovieData();
 
         return () => {
-            dispatch({ type: TYPES.CLEAR_MOVIE });
+            movieDispatch({ type: TYPES.CLEAR_MOVIE });
+            castDispatch({ type: TYPES.CLEAR_CAST });
             setLoaded(false);
         };
     }, [match.params.id]);
-
-    useEffect(() => {
-        console.log({ state });
-    }, [loaded]);
 
     // Render Trailer button. On click triggers state to open modal of trailer
     function renderYouTube(videos) {
@@ -305,8 +325,8 @@ const Movie = ({ location, match }) => {
         );
 
         const opts = {
-            height: "390px",
-            width: "640px"
+            height: "300px",
+            width: "500px"
         };
 
         return (
@@ -316,28 +336,28 @@ const Movie = ({ location, match }) => {
         );
     }
 
-    if (state.movie.loading && !state.movie.data && !loaded) {
+    if (movieState.loading && !movieState.data) {
         return <Loader />;
     }
 
-    if (state.movie.status_code) {
+    if (movieState.status_code) {
         history.push(process.env.PUBLIC_URL + "/404");
     }
 
     return (
         <Wrapper>
             <Helmet>
-                <title>{`${state.movie.data.title} - Movie Library`}</title>
+                <title>{`${movieState.data.title} - Movie Library`}</title>
             </Helmet>
             <LazyLoad height={800}>
                 <Element name="scroll-to-element" />
-                <Toggler />
+                <Header title="Movie" full />
                 <MovieHeaderWrapper>
                     <PosterWrapper>
                         <Poster
                             style={!loaded ? { display: "none" } : {}}
                             src={`${base_url}/${poster_sizes[3]}/${
-                                state.movie.data.poster_path
+                                movieState.data.poster_path
                             }`}
                             alt="movie poster"
                             onLoad={() => setLoaded(true)}
@@ -350,70 +370,77 @@ const Movie = ({ location, match }) => {
                         />
                     </PosterWrapper>
                     {/* right side header */}
-                    {renderYouTube(state.movie.data.videos.results)}
+                    {renderYouTube(movieState.data.videos.results)}
                 </MovieHeaderWrapper>
-                <MovieDetailsWrapper>
-                    <MovieTitle>{state.movie.data.title}</MovieTitle>
+                <MovieDetailsWrapper dark={theme.dark}>
+                    <MovieTitle dark={theme.dark}>
+                        {movieState.data.title}
+                    </MovieTitle>
                     <MainDetailsWrapper>
-                        <MainDetails>
-                            <MainDetailsText>
-                                {handleReleseDate(
-                                    state.movie.data.release_date
-                                )}
+                        <MainDetails dark={theme.dark}>
+                            <MainDetailsText dark={theme.dark}>
+                                {handleReleseDate(movieState.data.release_date)}
                             </MainDetailsText>
                         </MainDetails>
-                        <MainDetails>
-                            {handleGenres(state.movie.data.genres)}
+                        <MainDetails dark={theme.dark}>
+                            {handleGenres(movieState.data.genres, theme.dark)}
                         </MainDetails>
                         <MainDetailsText>
-                            <MainDetails>
-                                {handlePEGI(state.movie.data.adult)}
+                            <MainDetails dark={theme.dark}>
+                                {handlePEGI(movieState.data.adult, theme.dark)}
                             </MainDetails>
                         </MainDetailsText>
-                        <MainDetails>
+                        <MainDetails dark={theme.dark}>
                             {handleIMDB(
-                                state.movie.data.imdb_id,
-                                state.movie.data.vote_average
+                                movieState.data.imdb_id,
+                                movieState.data.vote_average,
+                                theme.dark
                             )}
                         </MainDetails>
                     </MainDetailsWrapper>
                     {/* Inner details */}
                     <InnerWrapper>
                         {/* left side */}
-                        <InnerDesc>
-                            <InnerDescTagline>
-                                {state.movie.data.tagline}
+                        <InnerDesc dark={theme.dark}>
+                            <InnerDescTagline dark={theme.dark}>
+                                {movieState.data.tagline}
                             </InnerDescTagline>
-                            <p>{state.movie.data.overview}</p>
+                            <p>{movieState.data.overview}</p>
                         </InnerDesc>
                         {/* line */}
-                        <Line />
+                        <Line dark={theme.dark} />
                         {/* right side */}
                         <InnerStats>
                             {/* Cast */}
                             <Cast
-                                cast={state.movie.cast}
+                                cast={castState.data}
                                 baseUrl={secure_base_url}
                             />
                             {/* Language */}
                             <StatsInner>
-                                <StatsHeader>Language</StatsHeader>
-                                <StatsText>
-                                    {state.movie.data.original_language.toUpperCase()}
+                                <StatsHeader dark={theme.dark}>
+                                    Language
+                                </StatsHeader>
+                                <StatsText dark={theme.dark}>
+                                    {movieState.data.original_language.toUpperCase()}
                                 </StatsText>
                             </StatsInner>
                             {/* Length */}
                             <StatsInner>
-                                <StatsHeader>Length</StatsHeader>
-                                <StatsText>
-                                    {state.movie.data.runtime} min.
+                                <StatsHeader dark={theme.dark}>
+                                    Length
+                                </StatsHeader>
+                                <StatsText dark={theme.dark}>
+                                    {movieState.data.runtime} min.
                                 </StatsText>
                             </StatsInner>
                             {/* Budget */}
                             <StatsInner>
-                                <StatsHeader>Budget</StatsHeader>
-                                <StatsText>
-                                    {handleBudget(state.movie.data.budget)}
+                                <StatsHeader dark={theme.dark}>
+                                    Budget
+                                </StatsHeader>
+                                <StatsText dark={theme.dark}>
+                                    {handleBudget(movieState.data.budget)}
                                 </StatsText>
                             </StatsInner>
                         </InnerStats>
@@ -424,6 +451,33 @@ const Movie = ({ location, match }) => {
     );
 };
 
+// data fetch on component mount
+const getMovie = async (id, movieDispatch) => {
+    movieDispatch({ type: TYPES.FETCH_MOVIE_LOADING });
+    const res = await tmdbAPI.get(`/movie/${id}`, {
+        params: {
+            api_key: process.env.REACT_APP_APIKEY,
+            append_to_response: "videos"
+        }
+    });
+    movieDispatch({ type: TYPES.FETCH_MOVIE, payload: res.data });
+    movieDispatch({ type: TYPES.FETCH_MOVIE_FINISHED });
+};
+
+const getCast = async (id, castDispatch) => {
+    castDispatch({ type: TYPES.FETCH_CAST_LOADING });
+    const res = await tmdbAPI.get(`/movie/${id}/credits`, {
+        params: {
+            api_key: process.env.REACT_APP_APIKEY
+        }
+    });
+    castDispatch({
+        type: TYPES.FETCH_CAST,
+        payload: [res.data.cast]
+    });
+    castDispatch({ type: TYPES.FETCH_CAST_FINISHED });
+};
+
 // handle release date
 const handleReleseDate = fullDate => {
     const date = fullDate.split("-");
@@ -431,9 +485,10 @@ const handleReleseDate = fullDate => {
 };
 
 // handle genres
-const handleGenres = genresArr => {
+const handleGenres = (genresArr, dark) => {
     return genresArr.map(genre => (
         <MainDetailsTextLink
+            dark={dark}
             to={`${process.env.PUBLIC_URL}/genres/${genre.name}`}
             key={genre.id}
         >
@@ -443,18 +498,22 @@ const handleGenres = genresArr => {
 };
 
 // handle PEGI
-const handlePEGI = isAdult => {
+const handlePEGI = (isAdult, dark) => {
     if (!isAdult) {
-        return <PegiAdult>12+</PegiAdult>;
+        return <PegiAdult dark={dark}>12+</PegiAdult>;
     } else {
-        return <PegiAdult>18+</PegiAdult>;
+        return <PegiAdult dark={dark}>18+</PegiAdult>;
     }
 };
 
 // handle IMDB
-const handleIMDB = (id, avgVote) => {
+const handleIMDB = (id, avgVote, dark) => {
     return (
-        <ImdbRaiting target="_blank" href={`https://www.imdb.com/title/${id}`}>
+        <ImdbRaiting
+            dark={dark}
+            target="_blank"
+            href={`https://www.imdb.com/title/${id}`}
+        >
             <ImdbLogo src={imdbLogo} alt="imdb logo" />
             <span>{avgVote}</span>
             <b>/ 10</b>

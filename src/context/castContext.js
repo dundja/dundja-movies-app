@@ -1,32 +1,32 @@
 import React, { createContext, useReducer } from "react";
 import * as TYPES from "./types";
 
-const MovieContext = createContext(null);
+const CastContext = createContext(null);
 
 const INITIAL_STATE = {
     loading: true
 };
 
-const moviesReducer = (state, action) => {
+const castReducer = (state, action) => {
     switch (action.type) {
-        case TYPES.FETCH_MOVIE_LOADING:
+        case TYPES.FETCH_CAST_LOADING:
             return {
                 ...state,
                 loading: true
             };
-        case TYPES.FETCH_MOVIE_FINISHED:
+        case TYPES.FETCH_CAST_FINISHED:
             return {
                 ...state,
                 loading: false
             };
-        case TYPES.FETCH_MOVIE:
+        case TYPES.FETCH_CAST:
             return {
                 ...state,
                 data: {
                     ...action.payload
                 }
             };
-        case TYPES.CLEAR_MOVIE:
+        case TYPES.CLEAR_CAST:
             return {
                 loading: true
             };
@@ -35,22 +35,19 @@ const moviesReducer = (state, action) => {
     }
 };
 
-const MovieProvider = props => {
-    const [movieState, movieDispatch] = useReducer(
-        moviesReducer,
-        INITIAL_STATE
-    );
+const CastProvider = props => {
+    const [castState, castDispatch] = useReducer(castReducer, INITIAL_STATE);
 
     return (
-        <MovieContext.Provider
+        <CastContext.Provider
             value={{
-                movieState,
-                movieDispatch
+                castState,
+                castDispatch
             }}
         >
             {props.children}
-        </MovieContext.Provider>
+        </CastContext.Provider>
     );
 };
 
-export { MovieContext, MovieProvider };
+export { CastContext, CastProvider };

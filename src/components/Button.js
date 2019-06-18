@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
+
+import { ThemeContext } from "../context/themeContext";
 
 const StyledButton = styled.button`
     display: flex;
@@ -18,17 +20,17 @@ const StyledButton = styled.button`
     height: ${props => (props.size === "small" ? "4rem" : "4rem")};
     flex-grow: 0;
     color: ${props =>
-        props.solid
-            ? "var(--color-lightLightBlue)"
-            : "var(--color-darkDarkBlue)"};
+        props.dark
+            ? "var(--color-darkDarkBlue)"
+            : "var(--color-darkMainWhite)"};
     border: ${props =>
-        props.solid
+        props.dark
             ? "1px solid var(--color-lightLightBlue)"
             : "1px solid var(--color-darkLightBlue)"};
     background-color: ${props =>
-        props.solid
-            ? "var(--color-darkMiddleBlue)"
-            : "var(--color-lightLightBlue)"};
+        props.dark
+            ? "var(--color-lightMiddleBlue)"
+            : "var(--color-darkDarkBlue)"};
     border-radius: 5rem;
     transition: all 600ms cubic-bezier(0.075, 0.82, 0.165, 1);
 
@@ -54,14 +56,16 @@ const StyledButton = styled.button`
     }
 `;
 
-const Button = ({ title, solid, icon, left, size }) => {
+const Button = ({ title, icon, left, size }) => {
+    const { theme } = useContext(ThemeContext);
+
     const Img = styled(icon)`
         height: 1rem;
         width: 1rem;
     `;
 
     return (
-        <StyledButton size={size} left={left ? 1 : 0} solid={solid ? 1 : 0}>
+        <StyledButton size={size} left={left ? 1 : 0} dark={theme.dark}>
             <Img alt="button image" />
             {title}
         </StyledButton>

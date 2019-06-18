@@ -1,7 +1,7 @@
 import React, { createContext, useReducer } from "react";
 import * as TYPES from "./types";
 
-const MovieContext = createContext(null);
+const MoviesContext = createContext(null);
 
 const INITIAL_STATE = {
     loading: true
@@ -9,24 +9,31 @@ const INITIAL_STATE = {
 
 const moviesReducer = (state, action) => {
     switch (action.type) {
-        case TYPES.FETCH_MOVIE_LOADING:
+        case TYPES.FETCH_MOVIES_LOADING:
             return {
                 ...state,
                 loading: true
             };
-        case TYPES.FETCH_MOVIE_FINISHED:
+        case TYPES.FETCH_MOVIES_FINISHED:
             return {
                 ...state,
                 loading: false
             };
-        case TYPES.FETCH_MOVIE:
+        case TYPES.FETCH_MOVIES_DATA:
             return {
                 ...state,
                 data: {
                     ...action.payload
                 }
             };
-        case TYPES.CLEAR_MOVIE:
+        case TYPES.FETCH_MOVIES_RECOMMENDED:
+            return {
+                ...state,
+                recomended: {
+                    ...action.payload
+                }
+            };
+        case TYPES.CLEAR_MOVIES:
             return {
                 loading: true
             };
@@ -35,22 +42,22 @@ const moviesReducer = (state, action) => {
     }
 };
 
-const MovieProvider = props => {
-    const [movieState, movieDispatch] = useReducer(
+const MoviesProvider = props => {
+    const [moviesState, moviesDispatch] = useReducer(
         moviesReducer,
         INITIAL_STATE
     );
 
     return (
-        <MovieContext.Provider
+        <MoviesContext.Provider
             value={{
-                movieState,
-                movieDispatch
+                moviesState,
+                moviesDispatch
             }}
         >
             {props.children}
-        </MovieContext.Provider>
+        </MoviesContext.Provider>
     );
 };
 
-export { MovieContext, MovieProvider };
+export { MoviesContext, MoviesProvider };

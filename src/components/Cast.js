@@ -36,14 +36,18 @@ const Credits = ({ cast, baseUrl }) => {
         return <Loader />;
     }
 
-    const items = cast.map(person => (
-        <CastItem person={person} baseUrl={baseUrl} key={person.id} />
-    ));
-
     return (
         <Wrapper>
             <Header>Cast</Header>
-            <Slider {...settings}>{items}</Slider>
+            <Slider {...settings}>
+                {cast[0].map(person => (
+                    <CastItem
+                        person={person}
+                        baseUrl={baseUrl}
+                        key={person.id}
+                    />
+                ))}
+            </Slider>
         </Wrapper>
     );
 };

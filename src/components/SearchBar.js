@@ -48,7 +48,7 @@ const Input = styled.input`
     color: ${props =>
         props.dark
             ? "var(--color-darkDarkBlue)"
-            : "var(--color-lightMiddleBlue)"};
+            : "var(--color-darkMainWhite)"};
     border: none;
     transition: all 300ms cubic-bezier(0.645, 0.045, 0.355, 1);
 
@@ -90,12 +90,12 @@ const Button = styled.button`
             : "var(--color-lightMiddleBlue)"};
 
     @media ${props => props.theme.mediaQueries.large} {
-        color: var(--text-color);
+        /* color: var(--text-color); */
         font-size: 10px;
     }
 
     @media ${props => props.theme.mediaQueries.small} {
-        color: var(--text-color);
+        /* color: var(--text-color); */
         font-size: 8px;
     }
 `;
@@ -103,9 +103,13 @@ const Button = styled.button`
 const StyledIcon = styled(FaSearch)`
     width: 2rem;
     height: 2rem;
+    color: ${props =>
+        props.dark
+            ? "var(--color-darkDarkBlue)"
+            : "var(--color-darkMainWhite)"};
 `;
 
-const SearchBar = () => {
+const SearchBar = ({ dark }) => {
     const [input, setInput] = useState("");
     const [state, setState] = useState(false);
     const node = useRef();
@@ -149,9 +153,10 @@ const SearchBar = () => {
             }}
             onSubmit={onFormSubmit}
             ref={node}
+            dark={dark}
         >
-            <Button type="submit" state={state}>
-                <StyledIcon />
+            <Button type="submit" state={state} dark={dark}>
+                <StyledIcon dark={dark} />
             </Button>
             <Input
                 onChange={e => setInput(e.target.value)}
@@ -159,6 +164,7 @@ const SearchBar = () => {
                 value={input}
                 state={state}
                 placeholder="Search for a movie..."
+                dark={dark}
             />
         </Form>
     );

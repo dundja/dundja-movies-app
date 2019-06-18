@@ -14,7 +14,7 @@ const StyledItem = styled.div`
     padding: 1rem;
     width: 100%;
     border-radius: 15px;
-    ${({ selected }) =>
+    ${({ selected, dark }) =>
         selected
             ? `&:before {
             content: "";
@@ -22,7 +22,11 @@ const StyledItem = styled.div`
             width: 100%;
             height: 100%;
             border-radius: 10px;
-            border: 1px solid var(--color-lightMiddleBlue);
+            border: ${
+                dark
+                    ? "1px solid var(--color-lightMiddleBlue)"
+                    : "1px solid var(--color-darkDarkBlue)"
+            }
     }`
             : null};
 
@@ -33,7 +37,10 @@ const StyledItem = styled.div`
             width: 100%;
             height: 100%;
             border-radius: 10px;
-            border: 1px solid var(--color-lightMiddleBlue);
+            border: ${({ dark }) =>
+                dark
+                    ? "1px solid var(--color-lightMiddleBlue)"
+                    : "1px solid var(--color-darkDarkBlue)"};
         }
     }
 `;
@@ -66,7 +73,7 @@ const IconMovie = styled(MdMovie)`
     height: 1.4rem;
 `;
 
-const MenuItem = ({ title, selected }) => {
+const MenuItem = ({ title, selected, dark }) => {
     const renderIcon = title => {
         switch (title) {
             case "Popular":
@@ -81,7 +88,7 @@ const MenuItem = ({ title, selected }) => {
     };
 
     return (
-        <StyledItem selected={selected}>
+        <StyledItem selected={selected} dark={dark}>
             {renderIcon(title)}
             <Text>{title}</Text>
         </StyledItem>

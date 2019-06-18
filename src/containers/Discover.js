@@ -4,7 +4,9 @@ import tmdbAPI from "../api";
 import * as TYPES from "../context/types";
 import { Helmet } from "react-helmet";
 import queryString from "query-string";
-import { MovieContext } from "../context/movieContext";
+import { MenuContext } from "../context/menuContext";
+import { MoviesContext } from "../context/moviesContext";
+import { GenresContext } from "../context/genresContext";
 import { Element } from "react-scroll";
 
 import Header from "../components/Header";
@@ -21,22 +23,23 @@ const Wrapper = styled.div`
 `;
 
 const Discover = ({ match, history, location }) => {
-    const { state, dispatch } = useContext(MovieContext);
-    const { secure_base_url } = state.config.images;
+    const { menuState, menuDispatch } = useContext(MenuContext);
+    const { moviesState, moviesDispatch } = useContext(MoviesContext);
+    const { genresState, genresDispatch } = useContext(GenresContext);
+    const { secure_base_url } = genresState.config.images;
     const params = queryString.parse(location.search);
     const query = match.params.name.replace(/\s+/g, "_").toLowerCase();
 
     useEffect(() => {
-        console.log("Discover mounted", state);
-        const setSelectedMenu = async (name, dispatch) => {
-            const { staticCategories, genres } = state;
+        const setSelectedMenu = async (name, menuDispatch) => {
+            const { staticCategories, genres } = genresState;
             if (!name) {
-                await dispatch({ type: TYPES.REMOVE_SELECTED_MENU });
+                await menuDispatch({ type: TYPES.REMOVE_SELECTED_MENU });
             } else if (
                 staticCategories.find(category => category === name) ||
                 genres.genres.find(genre => genre.name === name)
             ) {
-                await dispatch({
+                await menuDispatch({
                     type: TYPES.SELECTED_MENU,
                     payload: name
                 });
@@ -44,74 +47,58 @@ const Discover = ({ match, history, location }) => {
                 history.push(process.env.PUBLIC_URL + "/404");
             }
         };
-        setSelectedMenu(match.params.name, dispatch);
+        setSelectedMenu(match.params.name, menuDispatch);
 
-        // return () => setSelectedMenu();
+        return () => menuDispatch({ type: TYPES.REMOVE_SELECTED_MENU });
     }, [match.params.name]);
 
     useEffect(() => {
         // get movies
-        const getDiscoverMovies = async (name, page = 1, dispatch) => {
-            const { selected } = state;
+        const getDiscoverMovies = async (name, page = 1, moviesDispatch) => {
+            const { selected } = menuState;
             if (!selected) {
                 return;
             }
 
-            dispatch({ type: TYPES.FETCH_MOVIES_LOADING });
+            moviesDispatch({ type: TYPES.FETCH_MOVIES_LOADING });
             const res = await tmdbAPI.get(`/movie/${name}`, {
                 params: {
                     page,
                     api_key: process.env.REACT_APP_APIKEY
                 }
             });
-            await dispatch({
+            await moviesDispatch({
                 type: TYPES.FETCH_MOVIES_DATA,
                 payload: res.data
             });
-            dispatch({ type: TYPES.FETCH_MOVIES_FINISHED });
+            moviesDispatch({ type: TYPES.FETCH_MOVIES_FINISHED });
         };
-        getDiscoverMovies(query, params.page, dispatch);
+        getDiscoverMovies(query, params.page, moviesDispatch);
 
-        // return () => getDiscoverMovies();
+        // return () => moviesDispatch({ type: TYPES.CLEAR_MOVIES });
     }, [query, params.page]);
 
-    if (state.movies.loading) {
+    if (moviesState.loading) {
         return (
             <Wrapper>
-                <Helmet>
-                    <meta charSet="utf-8" />
-                    <title>{`${state.selected} Movies`}</title>
-                </Helmet>
-                <Header title={state.selected} subtitle="movies" />
                 <Loader />
             </Wrapper>
         );
     }
 
-    const settings = {
-        dots: false,
-        infinite: true,
-        autoplay: true,
-        autoplaySpeed: 3000,
-        swipeToSlide: true,
-        speed: 500,
-        slidesToShow: 3,
-        slidesToScroll: 1
-    };
-
     return (
         <Wrapper>
             <Helmet>
                 <meta charSet="utf-8" />
-                <title>{`${state.selected} Movies`}</title>
+                <title>{`${menuState.selected} Movies`}</title>
             </Helmet>
             <Element name="scroll-to-element" />
-            <Header title={state.selected} subtitle="movies" />
+            <Header title={menuState.selected} subtitle="movies" full />
             <MoviesList
-                movies={state.movies.data.results}
+                movies={moviesState.data.results}
                 baseUrl={secure_base_url}
             />
-            <Pagination movies={state.movies.data} />
+            <Pagination movies={moviesState.data} />
         </Wrapper>
     );
 };

@@ -50,7 +50,7 @@ const TitleWrapper = styled.div`
     flex: 1;
 `;
 
-const Header = ({ title, subtitle, size }) => {
+const Header = ({ title, subtitle, size, full }) => {
     const { theme } = useContext(ThemeContext);
 
     return (
@@ -63,8 +63,12 @@ const Header = ({ title, subtitle, size }) => {
                     {subtitle}
                 </Subtitle>
             </TitleWrapper>
-            <SearchBar />
-            <Toggler />
+            {full ? (
+                <>
+                    <SearchBar dark={theme.dark} />
+                    <Toggler />
+                </>
+            ) : null}
         </HeaderWrapper>
     );
 };

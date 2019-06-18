@@ -22,6 +22,10 @@ const Spinner = styled.div`
     position: relative;
     text-align: center;
 
+    position: absolute;
+    top: 30%;
+    left: 60%;
+
     -webkit-animation: ${skRotate} 2s infinite linear;
     animation: ${skRotate} 2s infinite linear;
 `;

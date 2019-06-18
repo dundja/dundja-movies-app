@@ -10,7 +10,7 @@ const theme = {
     },
 
     dark: {
-        mainWhite: `#F1FAEE`,
+        mainWhite: `#FDFDFD`,
         lightBlue: `#4182AD`,
         middleBlue: `#103859`,
         darkBlue: `#1C2630`,

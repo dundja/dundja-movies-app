@@ -4,7 +4,10 @@ import tmdbAPI from "../api";
 import * as TYPES from "../context/types";
 import queryString from "query-string";
 import { Helmet } from "react-helmet";
-import { MovieContext } from "../context/movieContext";
+import { MoviesContext } from "../context/moviesContext";
+import { GenresContext } from "../context/genresContext";
+import { ErrorContext } from "../context/errorContext";
+import { MenuContext } from "../context/menuContext";
 import { Element } from "react-scroll";
 
 import Header from "../components/Header";
@@ -22,20 +25,51 @@ const Wrapper = styled.div`
 `;
 
 const Genre = ({ match, history, location }) => {
-    const { state, dispatch } = useContext(MovieContext);
-    const { secure_base_url } = state.config.images;
+    const { moviesState, moviesDispatch } = useContext(MoviesContext);
+    const { genresState, genresDispatch } = useContext(GenresContext);
+    const { errorState, errorDispatch } = useContext(ErrorContext);
+    const { menuState, menuDispatch } = useContext(MenuContext);
+    const { secure_base_url } = genresState.config.images;
     const params = queryString.parse(location.search);
-    const query = match.params.name.replace(/\s+/g, "_").toLowerCase();
+    const { query } = match.params;
 
-    useEffect(() => {}, [match.params.name]);
+    useEffect(() => {
+        const getSearchMovies = async (query, page, moviesDispatch) => {
+            moviesDispatch({ type: TYPES.FETCH_MOVIES_LOADING });
+            try {
+                const res = await tmdbAPI.get(`/search/movie`, {
+                    params: {
+                        query,
+                        page,
+                        api_key: process.env.REACT_APP_APIKEY
+                    }
+                });
+                moviesDispatch({
+                    type: TYPES.FETCH_MOVIES_DATA,
+                    payload: res.data
+                });
+                moviesDispatch({ type: TYPES.FETCH_MOVIES_FINISHED });
+            } catch (err) {
+                errorDispatch({
+                    type: TYPES.INSERT_ERROR,
+                    payload: err.response
+                });
+                history.push(process.env.PUBLIC_URL + "/error");
+            }
+        };
+
+        getSearchMovies(query, params, moviesDispatch);
+
+        return () => moviesDispatch({ type: TYPES.CLEAR_MOVIES });
+    }, [query, params.page]);
 
     // If loading
-    if (state.movies.loading) {
+    if (moviesState.loading) {
         return <Loader />;
     }
 
     //If there are no results
-    else if (state.movies.total_results === 0) {
+    else if (moviesState.total_results === 0) {
         return (
             <NotFound
                 title="Sorry!"
@@ -47,15 +81,15 @@ const Genre = ({ match, history, location }) => {
             <Wrapper>
                 <Helmet>
                     <meta charSet="utf-8" />
-                    <title>{`${state.selected} Movies`}</title>
+                    <title>{`Search Movies`}</title>
                 </Helmet>
                 <Element name="scroll-to-element" />
-                <Header title={state.selected} subtitle="movies" />
+                <Header title="Search" subtitle="movies" full />
                 <MoviesList
-                    movies={state.movies.data.results}
+                    movies={moviesState.data.results}
                     baseUrl={secure_base_url}
                 />
-                <Pagination movies={state.movies.data} />
+                <Pagination movies={moviesState.data} />
             </Wrapper>
         );
     }

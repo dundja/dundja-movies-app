@@ -59,7 +59,7 @@ const NotFound = ({ title, subtitle }) => {
             </TitleWrapper>
             <Img src={`${NotfoundSvg}`} alt="Not found" />
             <LinkWrapper to={process.env.PUBLIC_URL + "/"}>
-                <Button title="Home" solid icon={FaHome} left />
+                <Button title="Home" icon={FaHome} left />
             </LinkWrapper>
         </Wrapper>
     );

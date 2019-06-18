@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { scroller } from "react-scroll";
@@ -49,7 +49,6 @@ const Pagination = ({ movies }) => {
                     onClick={scrollTo}
                 >
                     <Button
-                        solid
                         title={`Page ${page + 1}`}
                         icon={FaLongArrowAltRight}
                     />
@@ -67,7 +66,6 @@ const Pagination = ({ movies }) => {
                     onClick={scrollTo}
                 >
                     <Button
-                        solid
                         left
                         title={`Page ${page - 1}`}
                         icon={FaLongArrowAltLeft}
@@ -78,7 +76,6 @@ const Pagination = ({ movies }) => {
                     onClick={scrollTo}
                 >
                     <Button
-                        solid
                         title={`Page ${page + 1}`}
                         icon={FaLongArrowAltRight}
                     />
@@ -96,7 +93,6 @@ const Pagination = ({ movies }) => {
                     onClick={scrollTo}
                 >
                     <Button
-                        solid
                         left
                         title={`Page ${page - 1}`}
                         icon={FaLongArrowAltLeft}
