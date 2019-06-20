@@ -21,6 +21,7 @@ const Wrapper = styled.div`
     flex-direction: column;
     margin-top: 4rem;
     padding: 2rem;
+    position: relative;
 `;
 
 const Genre = ({ match, history, location }) => {
@@ -54,7 +55,7 @@ const Genre = ({ match, history, location }) => {
         };
         setSelectedMenu(match.params.name, genresDispatch, menuDispatch);
 
-        return () => menuDispatch({ type: TYPES.REMOVE_SELECTED_MENU });
+        // return () => menuDispatch({ type: TYPES.REMOVE_SELECTED_MENU });
     }, [match.params.name]);
 
     useEffect(() => {
@@ -91,9 +92,7 @@ const Genre = ({ match, history, location }) => {
         };
         getGenreMovies(query, params.page, option.value, moviesDispatch);
 
-        console.log({ moviesState });
-
-        // return () => moviesDispatch({ type: TYPES.CLEAR_MOVIES });
+        return () => moviesDispatch({ type: TYPES.CLEAR_MOVIES });
     }, [query, params.page, option]);
 
     if (moviesState.loading) {

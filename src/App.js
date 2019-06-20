@@ -6,8 +6,8 @@ import tmdbAPI from "./api";
 import { GenresContext } from "./context/genresContext";
 import { MenuContext } from "./context/menuContext";
 import { ThemeContext } from "./context/themeContext";
+import { Element } from "react-scroll";
 
-import mainBg from "./assets/img/mainBg.png";
 import Sidebar from "./containers/Sidebar";
 import Loader from "./components/Loader";
 import Genre from "./containers/Genre";
@@ -16,12 +16,16 @@ import NotFound from "./components/NotFound";
 import Movie from "./containers/Movie";
 import Search from "./containers/Search";
 import Person from "./containers/Person";
+import MenuMobile from "./containers/MenuMobile";
 
-const OuterLayour = styled.div`
+const OuterLayout = styled.div`
     height: 100%;
     width: 100%;
     position: relative;
-    background-color: #f1e8f0;
+    background-color: ${props =>
+        props.dark
+            ? "var(--color-darkMainWhite)"
+            : "var(--color-lightFeatured)"};
 `;
 
 const Layout = styled.div`
@@ -29,10 +33,15 @@ const Layout = styled.div`
     max-width: 120rem;
     width: 100%;
     margin: 0 auto;
+    background-color: ${props =>
+        props.dark
+            ? "var(--color-darkDarkBlue)"
+            : "var(--color-darkMainWhite)"};
 `;
 
 const AppWrapper = styled.main`
     display: flex;
+    flex-direction: ${props => (props.isMobile ? "column" : "row")};
     justify-content: space-between;
     width: 100%;
     height: 100%;
@@ -47,6 +56,7 @@ function App() {
     const { genresState, genresDispatch } = useContext(GenresContext);
     const { menuState, menuDispatch } = useContext(MenuContext);
     const { theme } = useContext(ThemeContext);
+    const [isMobile, setisMobile] = useState(null);
 
     // Get genres from API
     const getGenres = async (genresDispatch, menuDispatch) => {
@@ -77,8 +87,13 @@ function App() {
         });
     };
 
+    const changeMobile = () => {
+        window.matchMedia("(max-width: 1000px)").matches
+            ? setisMobile(true)
+            : setisMobile(false);
+    };
+
     useEffect(() => {
-        console.log("MAIN STATE APP COMPONENT", { genresState, menuState });
         // When app inits
         const init = async (genresDispatch, menuDispatch) => {
             genresDispatch({ type: TYPES.FETCH_GENRES_LOADING });
@@ -89,19 +104,34 @@ function App() {
         init(genresDispatch, menuDispatch);
     }, []);
 
+    useEffect(() => {
+        changeMobile();
+        window.addEventListener("resize", changeMobile);
+        return () => window.removeEventListener("resize", changeMobile);
+    }, []);
+
     return genresState.genres.loading ? (
-        <OuterLayour>
+        <OuterLayout dark={theme.dark}>
             <Layout>
                 <AppWrapper>
                     <Loader />
                 </AppWrapper>
             </Layout>
-        </OuterLayour>
+        </OuterLayout>
     ) : (
-        <OuterLayour>
+        <OuterLayout dark={theme.dark}>
             <Layout>
-                <AppWrapper dark={theme.dark}>
-                    <Sidebar />
+                <AppWrapper dark={theme.dark} isMobile={isMobile}>
+                    {isMobile ? (
+                        <MenuMobile
+                            genresState={genresState}
+                            menuState={menuState}
+                            dark={theme.dark}
+                        />
+                    ) : (
+                        <Sidebar />
+                    )}
+                    <Element />
                     <Switch>
                         <Route
                             path={process.env.PUBLIC_URL + "/"}
@@ -161,7 +191,7 @@ function App() {
                     </Switch>
                 </AppWrapper>
             </Layout>
-        </OuterLayour>
+        </OuterLayout>
     );
 }
 

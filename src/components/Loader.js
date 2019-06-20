@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 import styled, { keyframes } from "styled-components";
+import { ThemeContext } from "../context/themeContext";
 
 const skRotate = keyframes`
   100% { transform: rotate(360deg); -webkit-transform: rotate(360deg) }
@@ -24,7 +25,7 @@ const Spinner = styled.div`
 
     position: absolute;
     top: 30%;
-    left: 60%;
+    left: 45%;
 
     -webkit-animation: ${skRotate} 2s infinite linear;
     animation: ${skRotate} 2s infinite linear;
@@ -36,7 +37,10 @@ const Dot1 = styled.div`
     display: inline-block;
     position: absolute;
     top: 0;
-    background-color: var(--color-darkDarkBlue);
+    background-color: ${props =>
+        props.dark
+            ? "var(--color-lightMiddleBlue)"
+            : "var(--color-darkDarkBlue)"};
     border-radius: 100%;
 
     -webkit-animation: ${skBounce} 2s infinite ease-in-out;
@@ -51,10 +55,11 @@ const Dot2 = styled(Dot1)`
 `;
 
 const Loader = () => {
+    const { theme } = useContext(ThemeContext);
     return (
         <Spinner>
-            <Dot1 />
-            <Dot2 />
+            <Dot1 dark={theme.dark} />
+            <Dot2 dark={theme.dark} />
         </Spinner>
     );
 };

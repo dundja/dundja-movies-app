@@ -63,7 +63,7 @@ const MovieImg = styled.img`
         box-shadow: none;
     }
 
-    @media ${props => props.theme.mediaQueries.smaller} {
+    @media ${props => props.theme.mediaQueries.small} {
         height: 28rem;
     }
 `;

@@ -1,8 +1,8 @@
 import React, { useEffect, useContext, useState } from "react";
 import styled from "styled-components";
-import YouTube from "react-youtube";
 import * as TYPES from "../context/types";
 import { Link } from "react-router-dom";
+import Slider from "react-slick";
 import { GenresContext } from "../context/genresContext";
 import { PersonContext } from "../context/personContext";
 import { ErrorContext } from "../context/errorContext";
@@ -12,7 +12,6 @@ import queryString from "query-string";
 import history from "../history";
 import LazyLoad from "react-lazyload";
 import { Element, animateScroll as scroll } from "react-scroll";
-import { FaPlay } from "react-icons/fa";
 
 import NotFoundImg from "../assets/img/not-found.png";
 import imdbLogo from "../assets/img/imdb-seeklogo.com.svg";
@@ -41,16 +40,30 @@ const MovieHeaderWrapper = styled.div`
     justify-content: space-around;
     align-items: center;
     margin-top: 3rem;
+
+    @media ${props => props.theme.mediaQueries.larger} {
+        flex-direction: column;
+    }
 `;
 
 const PosterWrapper = styled.div`
     width: 40%;
     flex: 1 1 40%;
     padding: 3rem;
+
+    @media ${props => props.theme.mediaQueries.larger} {
+        flex: 1;
+        width: 50%;
+    }
+
+    @media ${props => props.theme.mediaQueries.small} {
+        width: 90%;
+    }
 `;
 
 const Poster = styled.img`
     max-height: 100%;
+    width: 100%;
     z-index: 11;
 `;
 
@@ -77,6 +90,10 @@ const MovieTitle = styled.h2`
 const MainDetailsWrapper = styled.div`
     display: flex;
     width: 60%;
+
+    @media ${props => props.theme.mediaQueries.small} {
+        width: 100%;
+    }
 `;
 
 const MainDetails = styled.div`
@@ -100,6 +117,10 @@ const MainDetails = styled.div`
 
 const MainDetailsText = styled.span`
     font-size: 1.4rem;
+
+    @media ${props => props.theme.mediaQueries.small} {
+        font-size: 1.2rem;
+    }
 `;
 
 const InnerWrapper = styled.div`
@@ -126,20 +147,42 @@ const InnerDescTagline = styled.h2`
             : "var(--color-lightDarkBlue)"};
     margin-bottom: 1.5rem;
 `;
+const SliderWrapper = styled.div`
+    flex: 1;
+    width: 80%;
+    display: flex;
+    justify-content: center;
+`;
+
+const SliderImg = styled.img`
+    width: 10rem;
+    height: 15rem;
+    margin: 0 0.5rem 0.5rem 0.5rem;
+
+    @media ${props => props.theme.mediaQueries.small} {
+        width: 7rem;
+        height: 11rem;
+        margin: 0 0.5rem 0.5rem 0.5rem;
+    }
+`;
 // Person component
 const Person = ({ location, match }) => {
     const [option, setOption] = useState({
         value: "popularity.desc",
         label: "Popularity"
     });
+    const [isMobile, setisMobile] = useState(null);
     const [loaded, setLoaded] = useState(false);
     const [error, setError] = useState(false);
     const { genresState } = useContext(GenresContext);
     const { personState, personDispatch } = useContext(PersonContext);
     const { errorDispatch } = useContext(ErrorContext);
     const params = queryString.parse(location.search);
-    const { secure_base_url } = genresState.config.images;
-    const { poster_sizes } = genresState.config.images;
+    const {
+        secure_base_url,
+        logo_sizes,
+        poster_sizes
+    } = genresState.config.images;
 
     useEffect(() => {
         scroll.scrollToTop({
@@ -164,8 +207,48 @@ const Person = ({ location, match }) => {
             personDispatch,
             errorDispatch
         );
-        console.log({ personState });
     }, [option]);
+
+    useEffect(() => {
+        changeMobile();
+        window.addEventListener("resize", changeMobile);
+        return () => window.removeEventListener("resize", changeMobile);
+    }, []);
+
+    const changeMobile = () => {
+        window.matchMedia("(max-width: 1200px)").matches
+            ? setisMobile(true)
+            : setisMobile(false);
+    };
+
+    const renderGallery = (isMobile, images) => {
+        if (!isMobile && !images) {
+            return (
+                <div style={{ flex: 1 }}>
+                    <Loader />
+                </div>
+            );
+        } else if (!isMobile && images) {
+            return <PersonGallery images={personState.images.data.profiles} />;
+        } else if (isMobile && images) {
+            const mobileGalleryImages = personState.images.data.profiles.slice(
+                0,
+                3
+            );
+            return (
+                <SliderWrapper>
+                    {mobileGalleryImages.map(img => (
+                        <SliderImg
+                            src={`${secure_base_url}/${logo_sizes[3]}/${
+                                img.file_path
+                            }`}
+                            alt="actor photo"
+                        />
+                    ))}
+                </SliderWrapper>
+            );
+        }
+    };
 
     if (personState.loading) {
         return <Loader />;
@@ -202,15 +285,7 @@ const Person = ({ location, match }) => {
                             />
                         </PosterWrapper>
                         {/* right side header */}
-                        {!personState.images.data ? (
-                            <div style={{ flex: 1 }}>
-                                <Loader />
-                            </div>
-                        ) : (
-                            <PersonGallery
-                                images={personState.images.data.profiles}
-                            />
-                        )}
+                        {renderGallery(isMobile, personState.images.data)}
                     </MovieHeaderWrapper>
                     <MovieDetailsWrapper>
                         <MovieTitle>{personState.data.name}</MovieTitle>

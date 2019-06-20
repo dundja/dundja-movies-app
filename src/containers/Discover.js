@@ -49,13 +49,14 @@ const Discover = ({ match, history, location }) => {
         };
         setSelectedMenu(match.params.name, menuDispatch);
 
-        return () => menuDispatch({ type: TYPES.REMOVE_SELECTED_MENU });
+        // return () => menuDispatch({ type: TYPES.REMOVE_SELECTED_MENU });
     }, [match.params.name]);
 
     useEffect(() => {
         // get movies
         const getDiscoverMovies = async (name, page = 1, moviesDispatch) => {
             const { selected } = menuState;
+            console.log("INSIDEE", selected);
             if (!selected) {
                 return;
             }
@@ -75,7 +76,7 @@ const Discover = ({ match, history, location }) => {
         };
         getDiscoverMovies(query, params.page, moviesDispatch);
 
-        // return () => moviesDispatch({ type: TYPES.CLEAR_MOVIES });
+        return () => moviesDispatch({ type: TYPES.CLEAR_MOVIES });
     }, [query, params.page]);
 
     if (moviesState.loading) {

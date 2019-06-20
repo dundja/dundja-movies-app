@@ -9,16 +9,13 @@ import { CastContext } from "../context/castContext";
 import { ThemeContext } from "../context/themeContext";
 import tmdbAPI from "../api";
 import { Helmet } from "react-helmet";
-import queryString from "query-string";
 import history from "../history";
 import LazyLoad from "react-lazyload";
 import { Element, animateScroll as scroll } from "react-scroll";
-import { FaPlay } from "react-icons/fa";
 
 import NotFoundImg from "../assets/img/not-found.png";
 import imdbLogo from "../assets/img/imdb-seeklogo.com.svg";
 import Loader from "../components/Loader";
-import Toggler from "../components/Toggler";
 import Cast from "../components/Cast";
 import Loading from "../components/Loading";
 import Button from "../components/Button";
@@ -39,13 +36,25 @@ const MovieHeaderWrapper = styled.div`
     justify-content: space-around;
     align-items: center;
     margin-top: 3rem;
+
+    @media ${props => props.theme.mediaQueries.medium} {
+        flex-direction: column;
+    }
 `;
 
-const PosterWrapper = styled.figure`
+const PosterWrapper = styled.div`
+    @media ${props => props.theme.mediaQueries.medium} {
+        max-width: 60%;
+        flex: 1 1 60%;
+    }
+`;
+
+const PosterFigure = styled.figure`
     position: relative;
     z-index: 10;
     -webkit-filter: sepia(0.3);
     filter: sepia(0.3);
+    transition: all 100ms cubic-bezier(0.645, 0.045, 0.355, 1);
 
     &:after,
     &:before {
@@ -83,6 +92,16 @@ const Poster = styled.img`
     width: 100%;
     height: 100%;
     z-index: 11;
+    transition: all 100ms cubic-bezier(0.645, 0.045, 0.355, 1);
+`;
+
+const PosterLoading = styled.div`
+    width: 340px;
+    height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 100ms cubic-bezier(0.645, 0.045, 0.355, 1);
 `;
 
 const MovieDetailsWrapper = styled.div`
@@ -97,6 +116,13 @@ const MovieDetailsWrapper = styled.div`
             : "var(--color-darkDarkBlue)"};
 `;
 
+const YouTubeWrapper = styled.div`
+    @media ${props => props.theme.mediaQueries.medium} {
+        width: 100%;
+        flex: 1;
+    }
+`;
+
 const MovieTitle = styled.h2`
     font-size: 3.5rem;
     color: ${props =>
@@ -106,11 +132,20 @@ const MovieTitle = styled.h2`
     text-transform: capitalize;
     display: block;
     margin-bottom: 1rem;
+
+    @media ${props => props.theme.mediaQueries.small} {
+        font-size: 2.5rem;
+    }
 `;
 
 const MainDetailsWrapper = styled.div`
     display: flex;
     width: 60%;
+
+    @media ${props => props.theme.mediaQueries.medium} {
+        width: 100%;
+        flex-direction: column;
+    }
 `;
 
 const MainDetails = styled.div`
@@ -131,6 +166,12 @@ const MainDetails = styled.div`
         margin-left: 1rem;
         height: 60%;
         width: 1px;
+    }
+
+    @media ${props => props.theme.mediaQueries.medium} {
+        &:after {
+            display: none;
+        }
     }
 `;
 
@@ -162,6 +203,10 @@ const MainDetailsTextLink = styled(Link)`
             width: 100%;
         }
     }
+
+    @media ${props => props.theme.mediaQueries.medium} {
+        font-size: 1.2rem;
+    }
 `;
 
 const MainDetailsText = styled.span`
@@ -170,9 +215,14 @@ const MainDetailsText = styled.span`
         props.dark
             ? "var(--color-darkDarkBlue)"
             : "var(--color-darkMainWhite)"};
+
+    @media ${props => props.theme.mediaQueries.medium} {
+        font-size: 1.2rem;
+    }
 `;
 
 const PegiAdult = styled.span`
+    display: flex;
     border: ${props =>
         props.dark
             ? "1px solid var(--color-darkDarkBlue)"
@@ -188,6 +238,11 @@ const PegiAdult = styled.span`
 const ImdbLogo = styled.img`
     width: 2.5rem !important;
     height: 1.5rem !important;
+
+    @media ${props => props.theme.mediaQueries.medium} {
+        width: 2rem !important;
+        height: 1rem !important;
+    }
 `;
 
 const ImdbRaiting = styled.a`
@@ -217,6 +272,10 @@ const InnerWrapper = styled.div`
     width: 100%;
     margin-top: 3rem;
     padding-bottom: 2rem;
+
+    @media ${props => props.theme.mediaQueries.medium} {
+        flex-direction: column;
+    }
 `;
 
 const Line = styled.div`
@@ -229,6 +288,10 @@ const Line = styled.div`
         props.dark
             ? "var(--color-darkDarkBlue)"
             : "var(--color-darkMainWhite)"};
+
+    @media ${props => props.theme.mediaQueries.medium} {
+        display: none;
+    }
 `;
 
 const InnerDesc = styled.div`
@@ -242,6 +305,10 @@ const InnerDesc = styled.div`
             props.dark
                 ? "var(--color-darkDarkBlue)"
                 : "var(--color-darkMainWhite)"};
+    }
+
+    @media ${props => props.theme.mediaQueries.medium} {
+        width: 100%;
     }
 `;
 
@@ -260,6 +327,11 @@ const InnerStats = styled.div`
     width: 50%;
     flex: 1;
     position: relative;
+
+    @media ${props => props.theme.mediaQueries.medium} {
+        max-width: 100%;
+        width: 100%;
+    }
 `;
 
 const StatsHeader = styled.h2`
@@ -315,29 +387,45 @@ const Movie = ({ location, match }) => {
         };
     }, [match.params.id]);
 
-    // Render Trailer button. On click triggers state to open modal of trailer
     function renderYouTube(videos) {
         if (videos.length === 0) {
             return;
         }
         const { key } = videos.find(
-            video => video.type === "Trailer" && video.site === "YouTube"
+            video =>
+                (video.type === "Trailer" || video.type === "Featurette") &&
+                video.site === "YouTube"
         );
+
+        const deviceWidth = window.innerWidth;
+        let width;
+
+        if (deviceWidth > 1200) {
+            width = "500px";
+        } else if (deviceWidth < 1200 && deviceWidth > 900) {
+            width = "420px";
+        } else {
+            width = "100%";
+        }
 
         const opts = {
             height: "300px",
-            width: "500px"
+            width
         };
 
         return (
-            <div>
+            <YouTubeWrapper>
                 <YouTube videoId={key} opts={opts} />
-            </div>
+            </YouTubeWrapper>
         );
     }
 
     if (movieState.loading && !movieState.data) {
-        return <Loader />;
+        return (
+            <Wrapper>
+                <Loader />
+            </Wrapper>
+        );
     }
 
     if (movieState.status_code) {
@@ -350,24 +438,30 @@ const Movie = ({ location, match }) => {
                 <title>{`${movieState.data.title} - Movie Library`}</title>
             </Helmet>
             <LazyLoad height={800}>
-                <Element name="scroll-to-element" />
                 <Header title="Movie" full />
                 <MovieHeaderWrapper>
                     <PosterWrapper>
-                        <Poster
-                            style={!loaded ? { display: "none" } : {}}
-                            src={`${base_url}/${poster_sizes[3]}/${
-                                movieState.data.poster_path
-                            }`}
-                            alt="movie poster"
-                            onLoad={() => setLoaded(true)}
-                            onError={e => {
-                                setError(true);
-                                if (e.target.src !== `${NotFoundImg}`) {
-                                    e.target.src = `${NotFoundImg}`;
-                                }
-                            }}
-                        />
+                        {!loaded ? (
+                            <PosterLoading>
+                                <Loading />
+                            </PosterLoading>
+                        ) : null}
+                        <PosterFigure>
+                            <Poster
+                                style={!loaded ? { display: "none" } : {}}
+                                src={`${base_url}/${poster_sizes[3]}/${
+                                    movieState.data.poster_path
+                                }`}
+                                alt="movie poster"
+                                onLoad={() => setLoaded(true)}
+                                onError={e => {
+                                    setError(true);
+                                    if (e.target.src !== `${NotFoundImg}`) {
+                                        e.target.src = `${NotFoundImg}`;
+                                    }
+                                }}
+                            />
+                        </PosterFigure>
                     </PosterWrapper>
                     {/* right side header */}
                     {renderYouTube(movieState.data.videos.results)}
@@ -413,6 +507,7 @@ const Movie = ({ location, match }) => {
                         <InnerStats>
                             {/* Cast */}
                             <Cast
+                                dark={theme.dark}
                                 cast={castState.data}
                                 baseUrl={secure_base_url}
                             />

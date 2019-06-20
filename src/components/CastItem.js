@@ -10,8 +10,8 @@ const LinkWrapper = styled(Link)`
     display: flex;
     align-items: center;
     justify-content: center;
-    /* opacity: ${props => (props.loaded ? "1" : "0")};
-    visibility: ${props => (props.loaded ? "visible" : "hidden")}; */
+    opacity: ${props => (props.loaded ? "1" : "0")};
+    visibility: ${props => (props.loaded ? "visible" : "hidden")};
     opacity: 1;
     visibility: visible;
 `;
@@ -44,14 +44,14 @@ const CastItem = ({ person, baseUrl }) => {
             <MovieImg
                 src={handleImg(person.profile_path)}
                 // Image loaded, set loaded to true
-                // onLoad={() => setLoaded(true)}
+                onLoad={() => setLoaded(true)}
                 // If no image, error will occurr, we set error to true
                 // And only change the src to the nothing svg if it isn't already, to avoid infinite callback
-                // onError={e => {
-                //     if (e.target.src !== `${PersonAvatar}`) {
-                //         e.target.src = `${PersonAvatar}`;
-                //     }
-                // }}
+                onError={e => {
+                    if (e.target.src !== `${PersonAvatar}`) {
+                        e.target.src = `${PersonAvatar}`;
+                    }
+                }}
             />
         </LinkWrapper>
     );

@@ -19,7 +19,7 @@ const MoviesWrapper = styled.div`
     }
 
     @media ${props => props.theme.mediaQueries.smaller} {
-        grid-template-columns: repeat(auto-fit, minmax(10rem, 18rem));
+        grid-template-columns: repeat(auto-fit, minmax(10rem, 17rem));
         grid-gap: 4rem 1rem;
     }
 `;

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import Slider from "react-slick";
 import Loader from "./Loader";
 import CastItem from "./CastItem";
@@ -13,12 +13,12 @@ const Header = styled.h2`
     font-size: 1.6rem;
     color: ${props =>
         props.dark
-            ? "var(--color-lightDarkBlue)"
+            ? "var(--color-darkDarkBlue)"
             : "var(--color-lightDarkBlue)"};
     margin-bottom: 1rem;
 `;
 
-const Credits = ({ cast, baseUrl }) => {
+const Cast = ({ cast, baseUrl, dark }) => {
     const settings = {
         dots: false,
         infinite: true,
@@ -26,7 +26,7 @@ const Credits = ({ cast, baseUrl }) => {
         autoplaySpeed: 3000,
         swipeToSlide: true,
         speed: 500,
-        slidesToShow: 8,
+        slidesToShow: 6,
         slidesToScroll: 1,
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />
@@ -38,7 +38,7 @@ const Credits = ({ cast, baseUrl }) => {
 
     return (
         <Wrapper>
-            <Header>Cast</Header>
+            <Header dark={dark}>Cast</Header>
             <Slider {...settings}>
                 {cast[0].map(person => (
                     <CastItem
@@ -96,4 +96,4 @@ function PrevArrow({ onClick }) {
     );
 }
 
-export default Credits;
+export default Cast;

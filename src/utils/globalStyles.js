@@ -18,6 +18,8 @@ export default createGlobalStyle`
   html {
     font-size: 62.5%;
     box-sizing: border-box;
+    background-color: ${props =>
+        props.dark ? props.theme.light.featured : props.theme.dark.darkBlue};
     /* universal colors */
     --color-white: ${props => props.theme.light.white};
     --color-black: ${props => props.theme.light.black};
@@ -35,7 +37,7 @@ export default createGlobalStyle`
     --color-darkFeatured: ${props => props.theme.dark.featured};
     /* shadows */
     --shadow-color: rgba(0, 0, 0, 0.2);
-      --shadow-color-dark: rgba(0, 0, 0, 0.25);
+    --shadow-color-dark: rgba(0, 0, 0, 0.25);
       
     @media ${props => props.theme.mediaQueries.small} {
       font-size: 60%;
