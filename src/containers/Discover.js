@@ -20,12 +20,13 @@ const Wrapper = styled.div`
     flex-direction: column;
     margin-top: 4rem;
     padding: 2rem;
+    position: relative;
 `;
 
 const Discover = ({ match, history, location }) => {
     const { menuState, menuDispatch } = useContext(MenuContext);
     const { moviesState, moviesDispatch } = useContext(MoviesContext);
-    const { genresState, genresDispatch } = useContext(GenresContext);
+    const { genresState } = useContext(GenresContext);
     const { secure_base_url } = genresState.config.images;
     const params = queryString.parse(location.search);
     const query = match.params.name.replace(/\s+/g, "_").toLowerCase();

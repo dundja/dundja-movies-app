@@ -11,14 +11,13 @@ import tmdbAPI from "../api";
 import { Helmet } from "react-helmet";
 import history from "../history";
 import LazyLoad from "react-lazyload";
-import { Element, animateScroll as scroll } from "react-scroll";
+import { animateScroll as scroll } from "react-scroll";
 
 import NotFoundImg from "../assets/img/not-found.png";
 import imdbLogo from "../assets/img/imdb-seeklogo.com.svg";
 import Loader from "../components/Loader";
 import Cast from "../components/Cast";
 import Loading from "../components/Loading";
-import Button from "../components/Button";
 import Header from "../components/Header";
 
 const Wrapper = styled.div`
@@ -359,7 +358,7 @@ const StatsText = styled.p`
 const Movie = ({ location, match }) => {
     const [loaded, setLoaded] = useState(false);
     const [error, setError] = useState(false);
-    const { genresState, genresDispatch } = useContext(GenresContext);
+    const { genresState } = useContext(GenresContext);
     const { movieState, movieDispatch } = useContext(MovieContext);
     const { castState, castDispatch } = useContext(CastContext);
     const { theme } = useContext(ThemeContext);

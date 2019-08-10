@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import StickyBox from "react-sticky-box";
 import { stack as Menu } from "react-burger-menu";
 
-import SearchBar from "../components/SearchBar";
 import MenuItem from "../components/MenuItem";
 
 const WrapperStickyBox = styled(StickyBox)`

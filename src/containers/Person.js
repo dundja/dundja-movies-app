@@ -1,8 +1,6 @@
 import React, { useEffect, useContext, useState } from "react";
 import styled from "styled-components";
 import * as TYPES from "../context/types";
-import { Link } from "react-router-dom";
-import Slider from "react-slick";
 import { GenresContext } from "../context/genresContext";
 import { PersonContext } from "../context/personContext";
 import { ErrorContext } from "../context/errorContext";
@@ -14,12 +12,7 @@ import LazyLoad from "react-lazyload";
 import { Element, animateScroll as scroll } from "react-scroll";
 
 import NotFoundImg from "../assets/img/not-found.png";
-import imdbLogo from "../assets/img/imdb-seeklogo.com.svg";
 import Loader from "../components/Loader";
-import Toggler from "../components/Toggler";
-import Cast from "../components/Cast";
-import Loading from "../components/Loading";
-import Button from "../components/Button";
 import PersonGallery from "../components/PersonGallery";
 import MoviesList from "../components/MoviesList";
 import Header from "../components/Header";
@@ -251,7 +244,11 @@ const Person = ({ location, match }) => {
     };
 
     if (personState.loading) {
-        return <Loader />;
+        return (
+            <Wrapper>
+                <Loader />
+            </Wrapper>
+        );
     } else {
         return (
             <Wrapper>

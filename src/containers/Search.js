@@ -7,7 +7,6 @@ import { Helmet } from "react-helmet";
 import { MoviesContext } from "../context/moviesContext";
 import { GenresContext } from "../context/genresContext";
 import { ErrorContext } from "../context/errorContext";
-import { MenuContext } from "../context/menuContext";
 import { Element } from "react-scroll";
 
 import Header from "../components/Header";
@@ -22,13 +21,13 @@ const Wrapper = styled.div`
     flex-direction: column;
     margin-top: 4rem;
     padding: 2rem;
+    position: relative;
 `;
 
 const Genre = ({ match, history, location }) => {
     const { moviesState, moviesDispatch } = useContext(MoviesContext);
-    const { genresState, genresDispatch } = useContext(GenresContext);
-    const { errorState, errorDispatch } = useContext(ErrorContext);
-    const { menuState, menuDispatch } = useContext(MenuContext);
+    const { genresState } = useContext(GenresContext);
+    const { errorDispatch } = useContext(ErrorContext);
     const { secure_base_url } = genresState.config.images;
     const params = queryString.parse(location.search);
     const { query } = match.params;
@@ -65,11 +64,12 @@ const Genre = ({ match, history, location }) => {
 
     // If loading
     if (moviesState.loading) {
-        return <Loader />;
-    }
-
-    //If there are no results
-    else if (moviesState.total_results === 0) {
+        return (
+            <Wrapper>
+                <Loader />
+            </Wrapper>
+        );
+    } else if (moviesState.data.total_results === 0) {
         return (
             <NotFound
                 title="Sorry!"

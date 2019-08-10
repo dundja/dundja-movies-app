@@ -51,6 +51,7 @@ const Img = styled.img`
 `;
 
 const NotFound = ({ title, subtitle }) => {
+    console.log("RENDER");
     return (
         <Wrapper>
             <TitleWrapper>
